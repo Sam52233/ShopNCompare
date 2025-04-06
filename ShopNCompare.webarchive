@@ -1,0 +1,281 @@
+bplist00—_WebMainResource’	
+_WebResourceData_WebResourceMIMEType_WebResourceFrameName^WebResourceURL_WebResourceTextEncodingNameO'(<!DOCTYPE html><html><head>
+    <title>ShopNCompare</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .input-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 250px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .best-price {
+            background-color: #e8f5e9;
+            font-weight: bold;
+        }
+        .delete-btn {
+            background-color: #ff5252;
+        }
+        .delete-btn:hover {
+            background-color: #ff1744;
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: #e8f5e9;
+        }
+        .store-total {
+            background-color: #f1f8e9;
+            font-weight: bold;
+        }
+        .best-total {
+            background-color: #c8e6c9;
+            font-weight: bold;
+        }
+        .site-title {
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="site-title">ShopNCompare</h1>
+        
+        <div class="input-section">
+            <h3>Add New Item</h3>
+            <input type="text" id="itemName" placeholder="Item name">
+            <button onclick="addItem()">Generate Prices</button>
+        </div>
+
+        <table id="priceTable">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Wegmans</th>
+                    <th>Walmart</th>
+                    <th>Target</th>
+                    <th>Best Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="priceList"><tr>
+                    <td>eggs</td>
+                    <td class="">$7.00</td>
+                    <td class="">$3.51</td>
+                    <td class="best-price">$1.82</td>
+                    <td>$1.82</td>
+                    <td><button class="delete-btn" onclick="deleteItem('eggs')">Delete</button></td>
+                </tr><tr>
+                    <td>bread</td>
+                    <td class="">$4.28</td>
+                    <td class="best-price">$3.48</td>
+                    <td class="">$4.47</td>
+                    <td>$3.48</td>
+                    <td><button class="delete-btn" onclick="deleteItem('bread')">Delete</button></td>
+                </tr><tr>
+                    <td>tortillas</td>
+                    <td class="best-price">$3.20</td>
+                    <td class="">$9.12</td>
+                    <td class="">$6.86</td>
+                    <td>$3.20</td>
+                    <td><button class="delete-btn" onclick="deleteItem('tortillas')">Delete</button></td>
+                </tr><tr>
+                    <td>plates</td>
+                    <td class="">$5.97</td>
+                    <td class="best-price">$2.24</td>
+                    <td class="">$7.85</td>
+                    <td>$2.24</td>
+                    <td><button class="delete-btn" onclick="deleteItem('plates')">Delete</button></td>
+                </tr><tr>
+                    <td>ground beef 93/7</td>
+                    <td class="">$7.55</td>
+                    <td class="">$5.17</td>
+                    <td class="best-price">$4.41</td>
+                    <td>$4.41</td>
+                    <td><button class="delete-btn" onclick="deleteItem('ground beef 93/7')">Delete</button></td>
+                </tr></tbody>
+            <tfoot>
+                <tr id="storeTotalsRow" class="store-total">
+                    <td>Store Totals</td>
+                    <td id="wegmansTotal">$28.00</td>
+                    <td id="walmartTotal" class="best-total">$23.52</td>
+                    <td id="targetTotal">$25.41</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="totalRow" class="total-row">
+                    <td>Lowest Price Total</td>
+                    <td colspan="3"></td>
+                    <td id="totalAmount">$15.15</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <script>
+        // Load saved data or start with empty object
+        let prices = JSON.parse(localStorage.getItem('prices')) || {};
+
+        function addItem() {
+            const item = document.getElementById('itemName').value.toLowerCase();
+            
+            if (item) {
+                // Generate random prices between $1.00 and $10.00
+                const wegmansPrice = generateRandomPrice();
+                const walmartPrice = generateRandomPrice();
+                const targetPrice = generateRandomPrice();
+                
+                if (!prices[item]) {
+                    prices[item] = {};
+                }
+                
+                prices[item]['wegmans'] = wegmansPrice;
+                prices[item]['walmart'] = walmartPrice;
+                prices[item]['target'] = targetPrice;
+                
+                saveData();
+                updateTable();
+                clearInputs();
+            }
+        }
+        
+        function generateRandomPrice() {
+            // Generate price between $1.00 and $10.00
+            return Math.round((Math.random() * 9 + 1) * 100) / 100;
+        }
+
+        function updateTable() {
+            const tbody = document.getElementById('priceList');
+            tbody.innerHTML = '';
+            
+            let totalCost = 0;
+            let wegmansTotal = 0;
+            let walmartTotal = 0;
+            let targetTotal = 0;
+
+            for (let item in prices) {
+                const row = document.createElement('tr');
+                const stores = prices[item];
+                
+                // Find best price
+                const validPrices = Object.values(stores).filter(p => p);
+                const bestPrice = Math.min(...validPrices);
+                
+                // Add to total
+                totalCost += bestPrice;
+                
+                // Add to store totals
+                if (stores.wegmans) wegmansTotal += stores.wegmans;
+                if (stores.walmart) walmartTotal += stores.walmart;
+                if (stores.target) targetTotal += stores.target;
+
+                row.innerHTML = `
+                    <td>${item}</td>
+                    <td class="${stores.wegmans === bestPrice ? 'best-price' : ''}">${formatPrice(stores.wegmans)}</td>
+                    <td class="${stores.walmart === bestPrice ? 'best-price' : ''}">${formatPrice(stores.walmart)}</td>
+                    <td class="${stores.target === bestPrice ? 'best-price' : ''}">${formatPrice(stores.target)}</td>
+                    <td>$${bestPrice.toFixed(2)}</td>
+                    <td><button class="delete-btn" onclick="deleteItem('${item}')">Delete</button></td>
+                `;
+                tbody.appendChild(row);
+            }
+            
+            // Update totals
+            document.getElementById('totalAmount').textContent = `$${totalCost.toFixed(2)}`;
+            document.getElementById('wegmansTotal').textContent = `$${wegmansTotal.toFixed(2)}`;
+            document.getElementById('walmartTotal').textContent = `$${walmartTotal.toFixed(2)}`;
+            document.getElementById('targetTotal').textContent = `$${targetTotal.toFixed(2)}`;
+            
+            // Highlight best store total
+            highlightBestStoreTotal(wegmansTotal, walmartTotal, targetTotal);
+        }
+        
+        function highlightBestStoreTotal(wegmansTotal, walmartTotal, targetTotal) {
+            // Remove previous highlighting
+            document.getElementById('wegmansTotal').classList.remove('best-total');
+            document.getElementById('walmartTotal').classList.remove('best-total');
+            document.getElementById('targetTotal').classList.remove('best-total');
+            
+            // Find the lowest total
+            const lowestTotal = Math.min(wegmansTotal, walmartTotal, targetTotal);
+            
+            // Add highlighting to the lowest total
+            if (wegmansTotal === lowestTotal) {
+                document.getElementById('wegmansTotal').classList.add('best-total');
+            }
+            if (walmartTotal === lowestTotal) {
+                document.getElementById('walmartTotal').classList.add('best-total');
+            }
+            if (targetTotal === lowestTotal) {
+                document.getElementById('targetTotal').classList.add('best-total');
+            }
+        }
+
+        function formatPrice(price) {
+            return price ? `$${price.toFixed(2)}` : '-';
+        }
+
+        function deleteItem(item) {
+            delete prices[item];
+            saveData();
+            updateTable();
+        }
+
+        function saveData() {
+            localStorage.setItem('prices', JSON.stringify(prices));
+        }
+
+        function clearInputs() {
+            document.getElementById('itemName').value = '';
+        }
+
+        // Initialize table
+        updateTable();
+    </script>
+
+
+</body></html>Ytext/htmlP_3file:///Users/samhafkin/Downloads/ShopNCompare.htmlUUTF-8    ( : P g v î'¿' 'À(                           (
